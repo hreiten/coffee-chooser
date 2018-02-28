@@ -77,7 +77,7 @@ def addParticipants():
 
 # function to "say stuff" in the terminal
 def speak(content):
-    person = 'Anna' # Fiona (SC); Nora (NOR); Agnes (US); Anna (DE)
+    person = 'Agnes' # Fiona (SC); Nora (NOR); Agnes (US); Anna (DE)
     os.system("say -v " + person + " '" + str(content) + "'")
 
 # draw random numbers and see if they match with chosen participants
@@ -89,13 +89,11 @@ def drawNumbers(participants):
 
     # If a winning number as been picked
     if randNum in participants:
-        print("A winner has been picked ..."); speak("Wir haben einen Sieger ausgewahlt");
+        print("We have a winner!"); speak("We have a winner!");
+        speak("And the winner is...")
         time.sleep(2)
+        speak("Number %i!" % randNum)
 
-        speak("Unt der Gewinner ist:")
-        time.sleep(1)
-
-        speak("Nummer %i! Heil Hitler." % randNum)
         print("Number %i is the chosen one! Go get some fucking coffee, participant #%i!!!" % (randNum, (1+participants.index(randNum))))
         subprocess.Popen(['osascript', '-e', 'tell application \"iTunes\" to play track \"Millionaire_win\" of playlist \"Millionaire\"'])
 
