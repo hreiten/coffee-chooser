@@ -77,7 +77,7 @@ def addParticipants():
 
 # function to "say stuff" in the terminal
 def speak(content):
-    person = 'Agnes' # Fiona (SC); Nora (NOR); Agnes (US); Anna (DE)
+    person = 'Daniel' # Fiona (SC); Nora (NOR); Al (US); Anna (DE); Daniel (DK)
     os.system("say -v " + person + " '" + str(content) + "'")
 
 # draw random numbers and see if they match with chosen participants
@@ -90,6 +90,7 @@ def drawNumbers(participants):
     # If a winning number as been picked
     if randNum in participants:
         print("We have a winner!"); speak("We have a winner!");
+        time.sleep(1)
         speak("And the winner is...")
         time.sleep(2)
         speak("Number %i!" % randNum)
