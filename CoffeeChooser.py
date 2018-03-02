@@ -106,7 +106,8 @@ def drawNumbers(participants):
     return True
 
 def updateStatistics(num_participants, drawed_numbers):
-    with open('data/drawed_number_statistics.csv', 'a') as f_a:
+    fpath = os.path.dirname(os.path.realpath(__file__)) + '/data/drawed_number_statistics.csv'
+    with open(fpath, 'a') as f_a:
         writer = csv.writer(f_a)
 
         for num in drawed_numbers:
