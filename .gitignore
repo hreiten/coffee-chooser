@@ -46,6 +46,7 @@ Thumbs.db
 ^ISLR.*
 *.tex
 *.pgm
+*.csv
 
 # files
 test.py
