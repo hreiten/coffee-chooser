@@ -1,6 +1,10 @@
 from random import randint, seed
 from datetime import datetime
-import time, sys, subprocess, csv, os
+from time import sleep
+import sys, csv, os, platform
+import vlc
+
+# pip install python-vlc
 
 # set random seed
 seed(datetime.now())
@@ -15,20 +19,14 @@ print("Violation of the rules may result in immediate evictions from the bro cir
 print("============================================\n")
 
 # global variables
+macOS = platform.system() == 'Darwin'
+work_dir = os.path.dirname(os.path.realpath(__file__))
 num_participants = -1
 drawed_numbers = []
 
-# sets iTunes to play intense music from 'Do you want to be a millionaire'
-def playIntenseMusic():
-    # subprocess.call(['open', 'Resources/millionaire_theme.mp3']) # this will actually open iTunes
-
-    # play and pause track immediately
-    subprocess.Popen(['osascript', '-e', 'tell application \"iTunes\" to play track \"Millionaire_theme\" of playlist \"Millionaire\"'])
-    subprocess.call(['osascript', '-e', 'tell application \"iTunes\" to pause'])
-
-    # reset track
-    subprocess.Popen(['osascript', '-e', 'tell application \"iTunes\" to set player position to 0'])
-    subprocess.Popen(['osascript', '-e', 'tell application \"iTunes\" to play track \"Millionaire_theme\" of playlist \"Millionaire\"'])
+def makeVLCMediaPlayer(songname):
+    player = vlc.MediaPlayer(work_dir + '/resources/' + songname)
+    return player
 
 def validateParticipant(num_participants, new_participant, participants):
     # check if newParticipant is unique
@@ -36,7 +34,7 @@ def validateParticipant(num_participants, new_participant, participants):
         return False
 
     # check if the number meets constraints
-    if (new_participant > 4*num_participants or new_participant < 0):
+    if (new_participant > 4*num_participants or new_participant < 1):
         return False
 
     return True
@@ -48,9 +46,14 @@ def addParticipants():
     # user enters how many participants to play
     global num_participants
     while num_participants <= 0:
-        num_participants = int(raw_input("Enter the number of participants (Press enter to continue): "))
+        num = raw_input("Enter the number of participants: ")
+        try:
+            num_participants = int(num)
+            if (num_participants <= 0): raise Exception
+        except:
+            print "Invalid input, try again..."
 
-    print("Valid participant numbers are between 0 and %i\n" % (num_participants*4))
+    print("Valid participant numbers are from 1 to %i\n" % (num_participants*4))
 
     # user enters the individual participants
     while True:
@@ -69,40 +72,43 @@ def addParticipants():
                 print("%i is invalid input, try again..." % (num))
 
         except:
-            if num == '': break
-            else: print("Invalid input, try again...")
+            print("Invalid input, try again...")
 
     print("All participants are now added!")
     return participants
 
-# function to "say stuff" in the terminal
+# function to say stuff in the terminal
 def speak(content):
-    person = 'Daniel' # Fiona (SC); Nora (NOR); Al (US); Anna (DE); Daniel (DK)
-    os.system("say -v " + person + " '" + str(content) + "'")
+    # the 'say' command only works on mac os
+    if (macOS):
+        person = 'Daniel' # Fiona (SC); Nora (NOR); Al (US); Anna (DE); Daniel (DK)
+        os.system("say -v " + person + " '" + str(content) + "'")
+    else:
+        pass
 
 # draw random numbers and see if they match with chosen participants
 def drawNumbers(participants):
-    randNum = randint(0, 4 * len(participants))
+    randNum = randint(1, 4 * len(participants))
 
     global drawed_numbers
     drawed_numbers.append(randNum)
 
     # If a winning number as been picked
     if randNum in participants:
-        print("We have a winner!"); speak("We have a winner!");
-        time.sleep(1)
+        print("We have a winner!");
+
+        speak("We have a winner!");
+        sleep(1)
         speak("And the winner is...")
-        time.sleep(2)
+        sleep(2)
         speak("Number %i!" % randNum)
 
         print("Number %i is the chosen one! Go get some fucking coffee, participant #%i!!!" % (randNum, (1+participants.index(randNum))))
-        subprocess.Popen(['osascript', '-e', 'tell application \"iTunes\" to play track \"Millionaire_win\" of playlist \"Millionaire\"'])
-
         return False
 
     print("Drawed number: %i" % randNum)
     speak(randNum)
-    time.sleep(5)
+    sleep(0.5)
     return True
 
 def updateStatistics(num_participants, drawed_numbers):
@@ -116,7 +122,14 @@ def updateStatistics(num_participants, drawed_numbers):
             writer.writerow(arr)
 
 def run():
-    playIntenseMusic()
+    # create media instances
+    player_theme = makeVLCMediaPlayer('millionaire_theme.mp3')
+    player_win = makeVLCMediaPlayer('millionaire_win.mp3')
+
+    # start theme music
+    player_theme.play()
+
+    # add participants to the game
     participants = addParticipants() # user adds participants
 
     print("\n*****The Coffee Chooser will now begin*****")
@@ -128,14 +141,20 @@ def run():
         if (timeLeft == 0):
             print('\nLet the games begin!\n')
             break
-        time.sleep(1)
+        sleep(1)
 
+    # start the game of drawing numbers
     while drawNumbers(participants): continue
+
+    # stop theme music, start winner music
+    player_win.play()
+    player_theme.stop()
 
     # update csv file with statistics
     updateStatistics(num_participants, drawed_numbers)
 
-    time.sleep(25) # let the music play for 25 seconds
-    subprocess.call(['osascript', '-e', 'tell application \"iTunes\" to pause']) # stop the track
+    while (player_win.get_state() == 3):
+        # state == 3 = vlc still playing the track
+        pass
 
 run()
