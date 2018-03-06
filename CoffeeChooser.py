@@ -4,6 +4,7 @@ from time import sleep
 import sys, csv, os, platform
 import vlc
 
+# if you haven't go
 # pip install python-vlc
 
 # set random seed
@@ -108,7 +109,7 @@ def drawNumbers(participants):
 
     print("Drawed number: %i" % randNum)
     speak(randNum)
-    sleep(0.5)
+    sleep(5)
     return True
 
 def updateStatistics(num_participants, drawed_numbers):
@@ -153,8 +154,9 @@ def run():
     # update csv file with statistics
     updateStatistics(num_participants, drawed_numbers)
 
-    while (player_win.get_state() == 3):
+    while (player_win.get_state() <= 3):
         # state == 3 = vlc still playing the track
         pass
+    player_win.stop()
 
 run()
