@@ -154,9 +154,9 @@ def run():
     # update csv file with statistics
     updateStatistics(num_participants, drawed_numbers)
 
-    while (player_win.get_state() <= 3):
-        # state == 3 = vlc still playing the track
-        pass
+    # while (player_win.get_state() <= 3):
+    #     pass
+    sleep(25)
     player_win.stop()
 
 run()
