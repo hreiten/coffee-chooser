@@ -4,11 +4,16 @@ from time import sleep
 import sys, csv, os, platform
 import vlc
 
-# if you haven't go
-# pip install python-vlc
-
 # set random seed
 seed(datetime.now())
+
+# set global variables
+macOS = platform.system() == 'Darwin'
+work_dir = os.path.dirname(os.path.realpath(__file__))
+num_participants = -1
+drawed_numbers = []
+
+# print rules
 print("\n\n******   The Amazing Coffee Chooser   ******")
 print("================== RULES ==================")
 print("1. The coffee must be served within 30 minutes.")
@@ -18,12 +23,6 @@ print("4. Everything in The Brocode written by Barney Stinson applies.")
 print("5. Whoever participating submits to following these rules to the best of their ability.")
 print("Violation of the rules may result in immediate evictions from the bro circle.")
 print("============================================\n")
-
-# global variables
-macOS = platform.system() == 'Darwin'
-work_dir = os.path.dirname(os.path.realpath(__file__))
-num_participants = -1
-drawed_numbers = []
 
 def makeVLCMediaPlayer(songname):
     player = vlc.MediaPlayer(work_dir + '/resources/' + songname)
@@ -154,9 +153,7 @@ def run():
     # update csv file with statistics
     updateStatistics(num_participants, drawed_numbers)
 
-    # while (player_win.get_state() <= 3):
-    #     pass
-    sleep(25)
-    player_win.stop()
+    sleep(25) # let the song play for 25 seconds
+    player_win.stop() # then stop
 
 run()
