@@ -50,3 +50,16 @@ Thumbs.db
 
 # files
 test.py
+
+data/
+
+# venv and python compilers
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+idea
+.idea/
+.code/

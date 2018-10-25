@@ -1,1 +1,1 @@
-python_vlc==3.0.102
+python-vlc==3.0.102
